@@ -1,2 +1,2 @@
 # gphotos
-Tool to check your Google Photos library
+A (hastily hacked together) tool to check your Google Photos library
