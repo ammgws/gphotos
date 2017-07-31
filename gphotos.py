@@ -2,16 +2,10 @@
 import datetime as dt
 import logging
 import os.path
-from sys import path
-
 # Third party imports
 import click
 import requests
-
 from google_auth import GoogleAuth as GoogleAuthOriginal
-
-# Get absolute path of the dir script is run from
-CWD = path[0]  # pylint: disable=C0103
 
 
 # override to add browser launch feature
@@ -26,12 +20,12 @@ class GoogleAuth(GoogleAuthOriginal):
         return auth_code
 
 
-def configure_logging():
+def configure_logging(config_path):
     # Configure root logger. Level 5 = verbose to catch mostly everything.
     logger = logging.getLogger()
     logger.setLevel(level=5)
 
-    log_folder = os.path.join(CWD, 'logs')
+    log_folder = os.path.join(config_path, 'logs')
     if not os.path.exists(log_folder):
         os.makedirs(log_folder, exist_ok=True)
 
@@ -50,16 +44,21 @@ def configure_logging():
 
 @click.command()
 @click.argument('filename')
-def main(filename):
+@click.option('--config_path', '-c',
+              type=click.Path(exists=True), default=os.path.expanduser('~/.config/gphotos'),
+              help='path to config dir.')
+def main(config_path, filename):
+    configure_logging(config_path)
+
     # Path to config file
-    config_path = os.path.join(CWD, 'config.ini')
-    logging.debug('Using config file: %s', config_path)
+    config_file = os.path.join(config_path, 'config.ini')
+    logging.debug('Using config file: %s', config_file)
 
     # Setup Google OAUTH instance for accessing Google Photos
     oauth2_scope = ('https://picasaweb.google.com/data/ '
                     'https://www.googleapis.com/auth/userinfo.email')
-    oauth = GoogleAuth(config_path, oauth2_scope, service='GooglePhotos')
-    oauth.google_authenticate()
+    oauth = GoogleAuth(config_file, oauth2_scope, service='GooglePhotos')
+    oauth.authenticate()
 
     # Check if filename exists in user's Google Photos library
     logging.debug('Getting emails for: %s', oauth.google_get_email())
