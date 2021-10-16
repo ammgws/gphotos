@@ -6,8 +6,8 @@ A (hastily hacked together) tool to check whether or not a specific file exists 
 
 #### Installation
 ```sh
-git clone https://github.com/ammgws/hangouts_linkgrabber.git  
-cd hangouts_linkgrabber
+git clone https://github.com/ammgws/gphotos.git  
+cd gphotos
 <create venv>
 pip install -r requirements.txt
 ```
